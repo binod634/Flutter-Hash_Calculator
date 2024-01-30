@@ -1,16 +1,14 @@
-# delete_me1
 
-A new Flutter project.
+# MD5 Calculator
+A simple flutter app for calculating MD5 HASH of give string/text.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## Screenshots
+![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Support
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+For support, email annomy634@gmail.com or join our Slack channel.
