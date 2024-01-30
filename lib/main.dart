@@ -14,6 +14,11 @@ class AppMeta extends StatelessWidget  {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "This is Sample App",
+      initialRoute: AppScreen.textView.name,
+      routes: {
+        AppScreen.textView.name:(context) => const AppState(),
+        AppScreen.fileView.name:(context) => const AppSecondState(),
+      },
       home: const AppState(),
       theme: ThemeData(
         useMaterial3: true,
@@ -40,6 +45,7 @@ class AppHomeImpl extends State<AppState> {
   // change Screens to somethings
   void changeScreen(int index) => setState(() {
         currentScreen = AppScreen.values[index];
+        Navigator.pushNamed(context, currentScreen.name);
       });
 
   void updateHash(String str) {
@@ -94,3 +100,28 @@ class AppHomeImpl extends State<AppState> {
   }
 }
 
+
+class AppSecondState extends StatefulWidget {
+  const AppSecondState({super.key});
+  
+  @override
+  State<StatefulWidget> createState() => SecondScreen();
+}
+
+
+class SecondScreen extends State<AppSecondState> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("File Upload"),centerTitle: true, backgroundColor: Theme.of(context).colorScheme.inversePrimary),
+      body: Center(
+        child: Column(
+          children: [
+            Text("Hi", style: TextStyle(fontWeight: FontWeight.bold))
+          ],
+        ),
+      ),
+    ); 
+  }
+
+}
