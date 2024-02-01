@@ -17,11 +17,6 @@ class AppMeta extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "This is Sample App",
-      initialRoute: AppScreen.textView.name,
-      routes: {
-        AppScreen.textView.name: (context) => const AppState(),
-        AppScreen.fileView.name: (context) => const AppSecondState(),
-      },
       home: const AppState(),
       theme: ThemeData(
           useMaterial3: true,
@@ -40,22 +35,17 @@ class AppState extends StatefulWidget {
 class AppHomeImpl extends State<AppState> {
   // AppScreens to show
   AppScreen currentScreen = AppScreen.textView;
-  // hash value
-  String? hash;
 
   // change Screens to somethings
   void changeScreen(int index) => setState(() {
-        currentScreen = AppScreen.values[index];
-        Navigator.pushNamed(context, currentScreen.name);
-        currentScreen = AppScreen.fileView; // Should have exitted File view already.
-      });
-
-  void updateHash(String str) {
-    String newHash = md5.convert(utf8.encode(str)).toString();
     setState(() {
-      hash = newHash;
+      currentScreen = AppScreen.values[index];
     });
-  }
+    }
+  );
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -65,26 +55,18 @@ class AppHomeImpl extends State<AppState> {
               style: TextStyle(fontWeight: FontWeight.bold)),
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           centerTitle: true),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextFormField(
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(), labelText: "Text"),
-                onChanged: updateHash,
-              ),
-              Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 25),
-                  child: Text(
-                    "MD5:  ${hash ?? 'Null'}",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ))
-            ],
-          ),
+      body:  Center(
+        child: Stack(
+          children: [
+            Visibility(
+              visible: currentScreen == AppScreen.textView,
+              child: const AppTextView(),
+            ),
+            Visibility(
+              visible: currentScreen == AppScreen.fileView,
+               child: const AppFileView()
+            )
+          ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -106,14 +88,56 @@ class AppHomeImpl extends State<AppState> {
   }
 }
 
-class AppSecondState extends StatefulWidget {
-  const AppSecondState({super.key});
+class AppTextView extends StatefulWidget {
+  const AppTextView({super.key});
 
   @override
-  State<StatefulWidget> createState() => SecondScreen();
+  State<StatefulWidget> createState() => AppTextViewImpl();
 }
 
-class SecondScreen extends State<AppSecondState> {
+class AppTextViewImpl extends State<AppTextView> {
+  String? hash;
+
+  void updateHashFromText(String str) {
+    String newHash = md5.convert(utf8.encode(str)).toString();
+    setState(() {
+      hash = newHash;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextFormField(
+            decoration: const InputDecoration(
+                border: OutlineInputBorder(), labelText: "Text"),
+            onChanged: updateHashFromText,
+          ),
+          Padding(
+              padding: const EdgeInsets.symmetric(vertical: 25),
+              child: SelectableText(
+                "MD5:  $hash",
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ))
+        ],
+      ),
+    );
+  }
+}
+
+class AppFileView extends StatefulWidget {
+  const AppFileView({super.key});
+
+  @override
+  State<StatefulWidget> createState() => AppFileViewImpl();
+}
+
+class AppFileViewImpl extends State<AppFileView> {
   String? hash;
 
   Future<void> pickFile() async {
@@ -121,38 +145,28 @@ class SecondScreen extends State<AppSecondState> {
     if (result != null) {
       hashFile(result);
       Fluttertoast.showToast(msg: "Hello");
-     }
+    }
   }
-
+  
   Future<void> hashFile(FilePickerResult filePickerResult) async {
     File file = File(filePickerResult.paths.first!);
     setState(() {
       hash = md5.convert(file.readAsBytesSync()).toString();
     });
   }
-  
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          title: const Text(
-            "File Upload",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary),
-      body:  Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(hash ?? 'Null',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            FilledButton(onPressed: pickFile, child: const Text("Pick File")  
-            ),
-          ],
+    return  Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SelectableText(hash != null ? hash.toString() : "Null",
+            style: const TextStyle(fontWeight: FontWeight.bold)),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 10.0),
         ),
-      ),
+        FilledButton(onPressed: pickFile, child: const Text("Pick File")),
+      ],
     );
   }
 }
