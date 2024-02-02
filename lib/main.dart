@@ -120,7 +120,7 @@ class AppTextViewImpl extends State<AppTextView> {
           Padding(
               padding: const EdgeInsets.symmetric(vertical: 25),
               child: SelectableText(
-                "MD5:  $hash",
+                hash != null ? "MD5: $hash" : "Type something.",
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ))
@@ -133,6 +133,7 @@ class AppTextViewImpl extends State<AppTextView> {
 class AppFileView extends StatefulWidget {
   const AppFileView({super.key});
 
+
   @override
   State<StatefulWidget> createState() => AppFileViewImpl();
 }
@@ -144,11 +145,20 @@ class AppFileViewImpl extends State<AppFileView> {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null) {
       hashFile(result);
-      Fluttertoast.showToast(msg: "Hello");
+      Fluttertoast.showToast(msg: "File Encrypted.");
     }
   }
   
   Future<void> hashFile(FilePickerResult filePickerResult) async {
+    List<Hash> listAllHashes = [
+      md5,
+      sha224,
+      sha1,
+      sha256,
+      sha512,
+      sha384,
+    ];
+    
     File file = File(filePickerResult.paths.first!);
     setState(() {
       hash = md5.convert(file.readAsBytesSync()).toString();
@@ -160,12 +170,13 @@ class AppFileViewImpl extends State<AppFileView> {
     return  Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SelectableText(hash != null ? hash.toString() : "Null",
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+        FilledButton.icon(onPressed: pickFile, clipBehavior: Clip.hardEdge, icon: const Icon(Icons.file_copy),
+        label: const Text("Pick File"),),
         const Padding(
           padding: EdgeInsets.symmetric(vertical: 10.0),
         ),
-        FilledButton(onPressed: pickFile, child: const Text("Pick File")),
+        SelectableText(hash != null ? "MD5: $hash" : "Pick a File First.",
+            style: const TextStyle(fontWeight: FontWeight.bold)),
       ],
     );
   }
