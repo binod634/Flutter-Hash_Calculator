@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -92,12 +93,27 @@ class AppTextView extends StatefulWidget {
 
 class AppTextViewImpl extends State<AppTextView> {
   String? hash;
+  String? currentString;
+  Hash currentlySelectedHash = listAllHashes.first;
 
   void updateHashFromText(String str) {
-    String newHash = md5.convert(utf8.encode(str)).toString();
+    currentString = str;
+    String newHash = currentlySelectedHash.convert(utf8.encode(str)).toString();
     setState(() {
       hash = newHash;
     });
+  }
+
+  void changeHash(Hash? algorithm) {
+    if (algorithm == null) {
+      return;
+    }
+    setState(() {
+      currentlySelectedHash = algorithm;
+    });
+    if (hash != null) {
+      updateHashFromText(currentString!);
+    }
   }
 
   @override
@@ -112,10 +128,18 @@ class AppTextViewImpl extends State<AppTextView> {
                 border: OutlineInputBorder(), labelText: "Text"),
             onChanged: updateHashFromText,
           ),
+          DropdownButton(
+              // icon: const Icon(Icons.abc),
+              value: currentlySelectedHash,
+              items: listAllHashes
+                  .map((e) => DropdownMenuItem(
+                      value: e, child: Text(stripInstanceOf(e.toString()))))
+                  .toList(),
+              onChanged: changeHash),
           Padding(
               padding: const EdgeInsets.symmetric(vertical: 25),
               child: SelectableText(
-                hash != null ? "MD5: $hash" : "Type something.",
+                hash != null ? "$hash" : "Type something.",
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ))
@@ -133,14 +157,6 @@ class AppFileView extends StatefulWidget {
 }
 
 class AppFileViewImpl extends State<AppFileView> {
-  List<Hash> listAllHashes = [
-    md5,
-    sha1,
-    sha224,
-    sha256,
-    sha384,
-    sha512,
-  ];
   FilePickerResult? result;
   Hash? currentlySelectedHash = md5;
   String? hash;
@@ -170,29 +186,31 @@ class AppFileViewImpl extends State<AppFileView> {
     });
   }
 
-  String stripInstanceOf(String name, {String prefix = ''}) {
-    return name.split('\'').elementAt(1).replaceAll('_', prefix);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        FilledButton.icon(
-          onPressed: pickFile,
-          clipBehavior: Clip.hardEdge,
-          icon: const Icon(Icons.file_copy),
-          label: const Text("Pick File"),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            FilledButton.icon(
+              onPressed: pickFile,
+              clipBehavior: Clip.hardEdge,
+              icon: const Icon(Icons.file_copy),
+              label: const Text("Pick File"),
+            ),
+            // customPadding(),
+            DropdownButton(
+                // icon: const Icon(Icons.abc),
+                value: currentlySelectedHash,
+                items: listAllHashes
+                    .map((e) => DropdownMenuItem(
+                        value: e, child: Text(stripInstanceOf(e.toString()))))
+                    .toList(),
+                onChanged: changeHash),
+          ],
         ),
-        customPadding(),
-        DropdownButton(
-            value: currentlySelectedHash,
-            items: listAllHashes
-                .map((e) => DropdownMenuItem(
-                    value: e, child: Text(stripInstanceOf(e.toString()))))
-                .toList(),
-            onChanged: changeHash),
         customPadding(),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -208,4 +226,17 @@ class AppFileViewImpl extends State<AppFileView> {
   Widget customPadding() {
     return const Padding(padding: EdgeInsets.symmetric(vertical: 10.0));
   }
+}
+
+List<Hash> listAllHashes = [
+  md5,
+  sha1,
+  sha224,
+  sha256,
+  sha384,
+  sha512,
+];
+
+String stripInstanceOf(String name, {String prefix = ''}) {
+  return name.split('\'').elementAt(1).replaceAll('_', prefix);
 }
