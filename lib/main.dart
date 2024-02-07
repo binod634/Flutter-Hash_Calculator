@@ -38,14 +38,10 @@ class AppHomeImpl extends State<AppState> {
 
   // change Screens to somethings
   void changeScreen(int index) => setState(() {
-    setState(() {
-      currentScreen = AppScreen.values[index];
-    });
-    }
-  );
-
-
-
+        setState(() {
+          currentScreen = AppScreen.values[index];
+        });
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +51,7 @@ class AppHomeImpl extends State<AppState> {
               style: TextStyle(fontWeight: FontWeight.bold)),
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           centerTitle: true),
-      body:  Center(
+      body: Center(
         child: Stack(
           children: [
             Visibility(
@@ -63,9 +59,8 @@ class AppHomeImpl extends State<AppState> {
               child: const AppTextView(),
             ),
             Visibility(
-              visible: currentScreen == AppScreen.fileView,
-               child: const AppFileView()
-            )
+                visible: currentScreen == AppScreen.fileView,
+                child: const AppFileView())
           ],
         ),
       ),
@@ -133,7 +128,6 @@ class AppTextViewImpl extends State<AppTextView> {
 class AppFileView extends StatefulWidget {
   const AppFileView({super.key});
 
-
   @override
   State<StatefulWidget> createState() => AppFileViewImpl();
 }
@@ -148,7 +142,7 @@ class AppFileViewImpl extends State<AppFileView> {
       Fluttertoast.showToast(msg: "File Encrypted.");
     }
   }
-  
+
   Future<void> hashFile(FilePickerResult filePickerResult) async {
     List<Hash> listAllHashes = [
       md5,
@@ -158,7 +152,7 @@ class AppFileViewImpl extends State<AppFileView> {
       sha512,
       sha384,
     ];
-    
+
     File file = File(filePickerResult.paths.first!);
     setState(() {
       hash = md5.convert(file.readAsBytesSync()).toString();
@@ -167,11 +161,15 @@ class AppFileViewImpl extends State<AppFileView> {
 
   @override
   Widget build(BuildContext context) {
-    return  Column(
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        FilledButton.icon(onPressed: pickFile, clipBehavior: Clip.hardEdge, icon: const Icon(Icons.file_copy),
-        label: const Text("Pick File"),),
+        FilledButton.icon(
+          onPressed: pickFile,
+          clipBehavior: Clip.hardEdge,
+          icon: const Icon(Icons.file_copy),
+          label: const Text("Pick File"),
+        ),
         const Padding(
           padding: EdgeInsets.symmetric(vertical: 10.0),
         ),
