@@ -133,6 +133,15 @@ class AppFileView extends StatefulWidget {
 }
 
 class AppFileViewImpl extends State<AppFileView> {
+  List<Hash> listAllHashes = [
+    md5,
+    sha224,
+    sha1,
+    sha256,
+    sha512,
+    sha384,
+  ];
+  Hash? currentlySelectedHash;
   String? hash;
 
   Future<void> pickFile() async {
@@ -143,19 +152,16 @@ class AppFileViewImpl extends State<AppFileView> {
     }
   }
 
-  Future<void> hashFile(FilePickerResult filePickerResult) async {
-    List<Hash> listAllHashes = [
-      md5,
-      sha224,
-      sha1,
-      sha256,
-      sha512,
-      sha384,
-    ];
+  void changeHash(Hash algorithm) {
+    setState(() {
+      currentlySelectedHash = algorithm;
+    });
+  }
 
+  Future<void> hashFile(FilePickerResult filePickerResult) async {
     File file = File(filePickerResult.paths.first!);
     setState(() {
-      hash = md5.convert(file.readAsBytesSync()).toString();
+      hash = currentlySelectedHash?.convert(file.readAsBytesSync()).toString();
     });
   }
 
@@ -177,5 +183,10 @@ class AppFileViewImpl extends State<AppFileView> {
             style: const TextStyle(fontWeight: FontWeight.bold)),
       ],
     );
+  }
+
+  // Constructor.
+  appFileView() {
+    currentlySelectedHash = listAllHashes.first;
   }
 }
