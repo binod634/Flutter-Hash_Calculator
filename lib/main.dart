@@ -152,7 +152,7 @@ class AppFileViewImpl extends State<AppFileView> {
     }
   }
 
-  void changeHash(Hash algorithm) {
+  void changeHash(Hash? algorithm) {
     setState(() {
       currentlySelectedHash = algorithm;
     });
@@ -176,13 +176,28 @@ class AppFileViewImpl extends State<AppFileView> {
           icon: const Icon(Icons.file_copy),
           label: const Text("Pick File"),
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 10.0),
+        customPadding(),
+        DropdownMenu(
+          onSelected: changeHash,
+          dropdownMenuEntries: listAllHashes
+              .map((newHash) =>
+                  DropdownMenuEntry(value: newHash, label: newHash.toString()))
+              .toList(),
         ),
+        DropdownButton(
+            items: listAllHashes
+                .map((e) => DropdownMenuItem(child: Text(e.toString())))
+                .toList(),
+            onChanged: null),
+        customPadding(),
         SelectableText(hash != null ? "MD5: $hash" : "Pick a File First.",
             style: const TextStyle(fontWeight: FontWeight.bold)),
       ],
     );
+  }
+
+  Widget customPadding() {
+    return const Padding(padding: EdgeInsets.symmetric(vertical: 10.0));
   }
 
   // Constructor.
