@@ -138,10 +138,10 @@ class AppFileViewImpl extends State<AppFileView> {
     sha224,
     sha1,
     sha256,
-    sha512,
     sha384,
+    sha512,
   ];
-  Hash? currentlySelectedHash;
+  Hash? currentlySelectedHash = md5;
   String? hash;
 
   Future<void> pickFile() async {
@@ -152,6 +152,7 @@ class AppFileViewImpl extends State<AppFileView> {
     }
   }
 
+  void doNone() {}
   void changeHash(Hash? algorithm) {
     setState(() {
       currentlySelectedHash = algorithm;
@@ -185,10 +186,14 @@ class AppFileViewImpl extends State<AppFileView> {
               .toList(),
         ),
         DropdownButton(
+            value: currentlySelectedHash,
             items: listAllHashes
-                .map((e) => DropdownMenuItem(child: Text(e.toString())))
+                .map((e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(e.toString()),
+                    ))
                 .toList(),
-            onChanged: null),
+            onChanged: changeHash),
         customPadding(),
         SelectableText(hash != null ? "MD5: $hash" : "Pick a File First.",
             style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -198,10 +203,5 @@ class AppFileViewImpl extends State<AppFileView> {
 
   Widget customPadding() {
     return const Padding(padding: EdgeInsets.symmetric(vertical: 10.0));
-  }
-
-  // Constructor.
-  appFileView() {
-    currentlySelectedHash = listAllHashes.first;
   }
 }
