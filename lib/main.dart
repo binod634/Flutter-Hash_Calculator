@@ -135,19 +135,20 @@ class AppFileView extends StatefulWidget {
 class AppFileViewImpl extends State<AppFileView> {
   List<Hash> listAllHashes = [
     md5,
-    sha224,
     sha1,
+    sha224,
     sha256,
     sha384,
     sha512,
   ];
+  FilePickerResult? result;
   Hash? currentlySelectedHash = md5;
   String? hash;
 
   Future<void> pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    result = await FilePicker.platform.pickFiles();
     if (result != null) {
-      hashFile(result);
+      hashFile(result!);
       Fluttertoast.showToast(msg: "File Encrypted.");
     }
   }
@@ -157,6 +158,9 @@ class AppFileViewImpl extends State<AppFileView> {
     setState(() {
       currentlySelectedHash = algorithm;
     });
+    if (hash != null) {
+      hashFile(result!);
+    }
   }
 
   Future<void> hashFile(FilePickerResult filePickerResult) async {
@@ -164,6 +168,10 @@ class AppFileViewImpl extends State<AppFileView> {
     setState(() {
       hash = currentlySelectedHash?.convert(file.readAsBytesSync()).toString();
     });
+  }
+
+  String stripInstanceOf(String name, {String prefix = ''}) {
+    return name.split('\'').elementAt(1).replaceAll('_', prefix);
   }
 
   @override
@@ -178,25 +186,21 @@ class AppFileViewImpl extends State<AppFileView> {
           label: const Text("Pick File"),
         ),
         customPadding(),
-        DropdownMenu(
-          onSelected: changeHash,
-          dropdownMenuEntries: listAllHashes
-              .map((newHash) =>
-                  DropdownMenuEntry(value: newHash, label: newHash.toString()))
-              .toList(),
-        ),
         DropdownButton(
             value: currentlySelectedHash,
             items: listAllHashes
                 .map((e) => DropdownMenuItem(
-                      value: e,
-                      child: Text(e.toString()),
-                    ))
+                    value: e, child: Text(stripInstanceOf(e.toString()))))
                 .toList(),
             onChanged: changeHash),
         customPadding(),
-        SelectableText(hash != null ? "MD5: $hash" : "Pick a File First.",
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: SelectableText(hash != null ? "$hash" : "Pick a File First.",
+              textAlign: TextAlign.center,
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        ),
       ],
     );
   }
