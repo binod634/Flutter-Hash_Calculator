@@ -165,7 +165,6 @@ class AppFileViewImpl extends State<AppFileView> {
     result = await FilePicker.platform.pickFiles();
     if (result != null) {
       hashFile(result!);
-      Fluttertoast.showToast(msg: "File Encrypted.");
     }
   }
 
